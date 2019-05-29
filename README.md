@@ -9,16 +9,29 @@ Firmware replacement for STC15F mcu-based DIY Clock Kit (available from banggood
 ## features
 Basic functionality is working:
 * time display/set (12/24 hour modes)
-* date display/set
+* date display/set (with reversible MM/YY, YY/MM display)
+* day of week
+* seconds display/reset
 * display auto-dim
-* temperature display in C
+* temperature display in C or F (with user-defined offset adjustment)
+* alarm with snooze
+
+## Experimental support
+* time sync to GPS receiver outputting serial NMEA data
+  * on `gps` branch: https://github.com/zerog2k/stc_diyclock/tree/gps
+  * for STC15W408AS or STC15W404AS (sorry no STC15F204EA, not enough ram/code, no hw uart)
+  * very experimental at this point (help wanted to polish this)
+* platformio support
+  * see platformio build section below for platform installation instructions
+  * tested on linux/vscode w/ stc15w408as based clock kit
 
 **note this project in development and a work-in-progress**
 *Pull requests are welcome.*
 
 ## TODOs
-* temperature display in C/F selectable (either build or run-time)
-* alarm and chime functionality
+* chime ?
+* time sync to WWVB radio receiver module (for STC15W408AS)
+
 
 ## hardware
 
@@ -39,13 +52,23 @@ Basic functionality is working:
 * stcgal (or optionally stc-isp). Note you can either do "git clone --recursive ..." when you check this repo out, or do "git submodule update --init --recursive" in order to fetch stcgal.
 
 ## usage
+choose platformio or traditional make build
+
+### platformio support
+_experimental_
+
+* assumes you have platformio installed
+* choose which mcu you are building for by uncommenting one `env_default` in `platformio.ini`
+* adjust `upload_port` as needed in `platformio.ini`
+
+### traditional make
 ```
 make clean
 make
 make flash
 ```
 
-## options
+#### make options
 * override default serial port:
 `STCGALPORT=/dev/ttyUSB0 make flash`
 
@@ -63,15 +86,17 @@ https://github.com/zerog2k/stc_diyclock/releases
 Instead of stcgal, you could alternatively use the official stc-isp tool, e.g stc-isp-15xx-v6.85I.exe, to flash.
 A windows app, but also works fine for me under mac and linux with wine.
 
+~~
 **note** due to optimizations that make use of "eeprom" section for holding lookup tables, if you are using 4k flash model mcu AND if using stc-isp tool, you must flash main.hex (as code file) and eeprom.hex (as eeprom file). (Ignore stc-isp warning about exceeding space when loading code file.)
 To generate eeprom.hex, run:
 ```
 make eeprom
 ```
+~~
 
 ## clock assumptions
-Some of the code assumes 11.0592 MHz internal RC system clock (set by stc-isp or stcgal).
-For example, delay routines would need to be adjusted if this is different.
+For STC15F204EA, some of the code assumes 11.0592 MHz internal RC system clock (set by stc-isp or stcgal).
+For example, delay routines might need to be adjusted if this is different. (Most timing has been moved to hardware timers.)
 
 ## disclaimers
 This code is provided as-is, with NO guarantees or liabilities.
@@ -99,7 +124,8 @@ VE3LNY's adaptation of this hardware to AVR (he has some interesting AVR project
 http://www.qsl.net/v/ve3lny/travel_clock.html
 
 [original firmware operation flow state diagram](docs/DIY_LED_Clock_operation_original.png)
-[kit instructions w/ schematic](docs/DIY_LED_Clock.png)
+
+Kit instructions w/ schematic: [scan](docs/DIY_LED_Clock.png) | [PDF](http://img.banggood.com/file/products/20170116024635SKU203096.pdf)
 
 
 ### chat
